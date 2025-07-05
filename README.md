@@ -26,32 +26,6 @@
 
 ---
 
-## Folder Structure
-Typing-Speed-Master-Pro/
-│
-├── index.html              # (Optional) Homepage or landing screen
-├── login.html              # Login/Register interface
-├── dashboard.html          # User dashboard with stats & mode selection
-├── practice.html           # Typing test interface
-│
-├── js/
-│   └── main.js             # Core JavaScript logic (login, dashboard, etc.)
-│
-├── css/
-│   └── style.css           # All global and page-specific styles
-│
-├── assets/                 # (Optional) Fonts, images, sounds
-│   ├── icons/              # User avatars, app icons
-│   └── sounds/             # Typing sounds (optional)
-│
-├── README.md               # Project documentation
-
-
-
-
-
----
-
 ## Technologies Used
 
 - **HTML5** (Semantic layout)
