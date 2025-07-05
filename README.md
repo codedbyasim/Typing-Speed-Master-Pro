@@ -29,15 +29,18 @@
 ## Folder Structure
 Typing-Speed-Master-Pro/
 │
-├── login.html 
-├── dashboard.html 
-├── practice.html 
+├── index.html              # (Optional) Homepage or landing screen
+├── login.html              # Login/Register interface
+├── dashboard.html          # User dashboard with stats & mode selection
+├── practice.html           # Typing test interface
 │
 ├── js/
-│ └── main.js 
+│   └── main.js             # Core JavaScript logic (login, dashboard, etc.)
 │
 ├── css/
-│ └── style.css 
+│   └── style.css           # All global and page-specific styles
+├── README.md               # Project documentation
+
 
 
 
