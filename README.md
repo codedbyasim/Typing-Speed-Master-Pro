@@ -39,6 +39,11 @@ Typing-Speed-Master-Pro/
 │
 ├── css/
 │   └── style.css           # All global and page-specific styles
+│
+├── assets/                 # (Optional) Fonts, images, sounds
+│   ├── icons/              # User avatars, app icons
+│   └── sounds/             # Typing sounds (optional)
+│
 ├── README.md               # Project documentation
 
 
