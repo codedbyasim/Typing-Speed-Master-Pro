@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice | Typing Speed Master Pro</title>
+  <link rel="stylesheet" href="style/main.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet" />
+</head>
+<body class="practice-page">
+
+  <header class="practice-header">
+    <h1>Typing Practice Mode</h1>
+    <a href="dashboard.html" class="btn back">← Back to Dashboard</a>
+  </header>
+
+  <div class="practice-container">
+    <div class="mode-label">
+      <strong>Mode:</strong> <span id="mode-name">Beginner</span>
+    </div>
+
+    <div id="quote-box" class="quote-box">
+      <p id="quote-display">Loading text...</p>
+    </div>
+
+    <textarea id="typing-input" placeholder="Start typing here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" disabled></textarea>
+
+    <div class="practice-stats">
+      <span>Time Left: <strong id="timer">60</strong>s</span>
+      <span>WPM: <strong id="wpm">0</strong></span>
+      <span>Accuracy: <strong id="accuracy">100%</strong></span>
+      <span>Mistakes: <strong id="mistakes">0</strong></span>
+    </div>
+
+    <div class="practice-controls">
+      <button id="start-btn" class="btn primary">Start</button>
+      <button id="reset-btn" class="btn secondary">Restart</button>
+      <button id="toggle-sound" class="btn">🔈 Sound: ON</button>
+    </div>
+  </div>
+
+  <script>
+    const modeText = document.getElementById('mode-name');
+    const quoteDisplay = document.getElementById('quote-display');
+    const inputBox = document.getElementById('typing-input');
+    const timerDisplay = document.getElementById('timer');
+    const wpmDisplay = document.getElementById('wpm');
+    const accDisplay = document.getElementById('accuracy');
+    const mistakeDisplay = document.getElementById('mistakes');
+
+    const startBtn = document.getElementById('start-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const toggleSound = document.getElementById('toggle-sound');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode') || 'beginner';
+    modeText.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+
+    const textSamples = {
+      beginner: [
+        "Typing is fun and easy.",
+        "Hello world!",
+        "Practice daily to improve."
+      ],
+      intermediate: [
+        "The quick brown fox jumps over the lazy dog.",
+        "Typing fast helps with productivity and confidence.",
+        "Accuracy is more important than speed in the beginning."
+      ],
+      advanced: [
+        "Consistent practice and focus are essential to mastering typing at high speed.",
+        "Avoid looking at the keyboard while typing to develop muscle memory.",
+        "Discipline and effort separate good typists from great ones."
+      ],
+      code: [
+        "for (let i = 0; i < 10; i++) { console.log(i); }",
+        "<div class='container'>Hello</div>",
+        "function sum(a, b) { return a + b; }"
+      ]
+    };
+
+    let timer;
+    let timeLeft = 60;
+    let mistakes = 0;
+    let isStarted = false;
+    let currentText = "";
+    let soundOn = true;
+    let startTime;
+
+    function loadText() {
+      if (mode === 'custom') {
+        currentText = prompt("Enter your custom text to practice:") || "No input provided.";
+      } else {
+        const sampleList = textSamples[mode] || textSamples.beginner;
+        currentText = sampleList[Math.floor(Math.random() * sampleList.length)];
+      }
+      quoteDisplay.innerHTML = "";
+      currentText.split("").forEach(char => {
+        const span = document.createElement("span");
+        span.innerText = char;
+        quoteDisplay.appendChild(span);
+      });
+    }
+
+    function startTest() {
+      loadText();
+      inputBox.disabled = false;
+      inputBox.value = "";
+      inputBox.focus();
+      timeLeft = 60;
+      timerDisplay.textContent = timeLeft;
+      wpmDisplay.textContent = 0;
+      accDisplay.textContent = "100%";
+      mistakeDisplay.textContent = 0;
+      mistakes = 0;
+      startTime = new Date();
+      isStarted = true;
+
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          inputBox.disabled = true;
+        }
+      }, 1000);
+    }
+
+    function calculateStats() {
+      const typed = inputBox.value;
+      const correctChars = quoteDisplay.querySelectorAll("span.correct").length;
+      const accuracy = ((correctChars / currentText.length) * 100).toFixed(1);
+      const elapsed = (60 - timeLeft) || 1;
+      const wordsTyped = typed.trim().split(" ").length;
+      const wpm = Math.round((wordsTyped / elapsed) * 60);
+      wpmDisplay.textContent = wpm;
+      accDisplay.textContent = `${accuracy}%`;
+      mistakeDisplay.textContent = mistakes;
+    }
+
+    inputBox.addEventListener("input", () => {
+      const input = inputBox.value;
+      const spans = quoteDisplay.querySelectorAll("span");
+      mistakes = 0;
+
+      spans.forEach((span, i) => {
+        const char = input[i];
+        if (char == null) {
+          span.classList.remove("correct", "incorrect");
+        } else if (char === span.innerText) {
+          span.classList.add("correct");
+          span.classList.remove("incorrect");
+        } else {
+          span.classList.add("incorrect");
+          span.classList.remove("correct");
+          mistakes++;
+        }
+      });
+
+      if (mode === 'advanced' && input[input.length - 1] === "Backspace") {
+        mistakes++; // Penalty
+      }
+
+      if (soundOn) {
+        const audio = new Audio("assets/sounds/type.mp3");
+        audio.play();
+      }
+
+      calculateStats();
+    });
+
+    resetBtn.onclick = () => {
+      inputBox.disabled = true;
+      isStarted = false;
+      clearInterval(timer);
+      timerDisplay.textContent = "60";
+      wpmDisplay.textContent = "0";
+      accDisplay.textContent = "100%";
+      mistakeDisplay.textContent = "0";
+      quoteDisplay.innerHTML = "Press Start to begin again.";
+    };
+
+    startBtn.onclick = startTest;
+
+    toggleSound.onclick = () => {
+      soundOn = !soundOn;
+      toggleSound.innerText = soundOn ? "🔈 Sound: ON" : "🔇 Sound: OFF";
+    };
+
+    window.onload = loadText;
+  </script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>

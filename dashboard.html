@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | Typing Speed Master Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --primary: #00d9ff;
+      --accent: #4e54c8;
+      --bg: #f4f7ff;
+      --card-bg: #ffffff;
+      --text: #222;
+    }
+
+    body {
+      font-family: 'Fira Code', monospace;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--primary);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    header .logout-btn {
+      background: white;
+      color: var(--primary);
+      padding: 0.5rem 1rem;
+      border: none;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .dashboard-container {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .user-box {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+      line-height: 80px;
+      font-size: 2rem;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+
+    .stats-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      justify-content: center;
+    }
+
+    .stat-card {
+      flex: 1 1 200px;
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    .stat-card h2 {
+      font-size: 2rem;
+      margin: 0;
+      color: var(--primary);
+    }
+
+    .stat-card p {
+      margin: 0.5rem 0 0;
+      color: #777;
+    }
+
+    .practice-options {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .practice-options h3 {
+      margin-bottom: 1rem;
+    }
+
+    .practice-options .mode-btn {
+      margin: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .chart-container {
+      margin-top: 3rem;
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: 250px;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Dashboard</h1>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </header>
+
+  <div class="dashboard-container">
+
+    <div class="user-box">
+      <div class="avatar" id="avatar">A</div>
+      <h2 id="username-display">Welcome, User!</h2>
+      <p>Keep typing and break your speed records!</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h2 id="best-wpm">72</h2>
+        <p>Best WPM</p>
+      </div>
+      <div class="stat-card">
+        <h2 id="avg-accuracy">96%</h2>
+        <p>Average Accuracy</p>
+      </div>
+      <div class="stat-card">
+        <h2 id="total-tests">34</h2>
+        <p>Tests Completed</p>
+      </div>
+    </div>
+
+    <div class="practice-options">
+      <h3>Choose a Typing Mode</h3>
+      <button class="mode-btn" onclick="startPractice('beginner')">Beginner</button>
+      <button class="mode-btn" onclick="startPractice('intermediate')">Intermediate</button>
+      <button class="mode-btn" onclick="startPractice('advanced')">Advanced</button>
+      <button class="mode-btn" onclick="startPractice('code')">Code Mode</button>
+      <button class="mode-btn" onclick="startPractice('custom')">Custom Text</button>
+    </div>
+
+    <div class="chart-container">
+      <h3>Your Progress</h3>
+      <canvas id="progressChart"></canvas>
+    </div>
+
+    <footer>
+        <p>Created with ❤️ by Asim | <a href="#">GitHub</a> | <a href="#">Contact</a></p>
+      </footer>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const username = localStorage.getItem('loggedInUser') || 'Guest';
+    document.getElementById('username-display').innerText = `Welcome, ${username}!`;
+    document.getElementById('avatar').innerText = username[0].toUpperCase();
+
+    function logout() {
+      localStorage.removeItem('loggedInUser');
+      location.href = 'login.html';
+    }
+
+    function startPractice(mode) {
+      location.href = `practice.html?mode=${mode}`;
+    }
+
+    // Sample chart data
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+        datasets: [{
+          label: 'WPM',
+          data: [52, 60, 58, 64, 72],
+          backgroundColor: 'rgba(0, 217, 255, 0.2)',
+          borderColor: '#00d9ff',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  </script>
+  <script src="js/main.js"></script>
+
+
+</body>
+</html>
